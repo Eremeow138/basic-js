@@ -4,7 +4,7 @@ module.exports = function transform(arr) {
   // throw new CustomError('Not implemented');
   // remove line with error and write your code here
   if (!Array.isArray(arr)) {
-    throw Error;
+    throw new Error('Error');
   }
   if(arr.find(item => item === '--discard-next' || item === '--discard-prev' || item === '--double-prev' || item === '--double-next' ) === undefined){
     return arr;
@@ -12,42 +12,32 @@ module.exports = function transform(arr) {
 
   let transArr = [];
   for (let i = 0; i < arr.length; i++) {
-
-    if(arr[i] === '--discard-next' || arr[i] === '--discard-prev' || arr[i] === '--double-next' || arr[i] === '--double-prev' ){
-      continue;
-    }
-    if(arr[i-1] === '--discard-next'){
-      continue;
-    }
-    if (arr[i-1] === '--double-next') {
-      transArr.push(arr[i]);
-      transArr.push(arr[i]);
-      // continue;
-    }
-    if (arr[i+1] === '--discard-prev') {
-      if(arr[i-1] === '--double-next'){
-        transArr.pop();
-        continue;
-      }else{
-        continue;
-      }
-
-    }
-    if (arr[i+1] === '--double-prev') {
-      if (arr[i-1] === '--double-next') {
+    switch (arr[i]) {
+      case '--discard-next':
+        i++;
+        break;
+      case '--discard-prev':
+        if(arr[i-2] !== '--discard-next'){
+          transArr.pop();
+        }
+        break;
+      case '--double-next':
+        if(arr[i+1] !== undefined){
+          transArr.push(arr[i+1]);
+        }
+        break;
+      case '--double-prev':
+        if(arr[i-1] !== undefined && arr[i-2] !== '--discard-next'){
+          transArr.push(arr[i-1]);
+        }
+        break;
+      default:
         transArr.push(arr[i]);
-        continue;
-      }else{
-        transArr.push(arr[i]);
-        transArr.push(arr[i]);
-        continue;
-      }
+        break;
+    }
 
-    }
-    if(arr[i-1] !== '--double-next'){
-      transArr.push(arr[i]);
-    }
   }
+  
   return transArr;
 
 };
